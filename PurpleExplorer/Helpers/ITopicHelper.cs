@@ -21,4 +21,6 @@ public interface ITopicHelper
         Message message);
     public Task DeadletterMessage(ServiceBusConnectionString connectionString, string topicPath, string subscriptionPath,
         Message message);
+
+    public Task<IList<Rule>> GetRulesBySubscription(ServiceBusConnectionString connectionString, string topicPath, string subscriptionName);
 }

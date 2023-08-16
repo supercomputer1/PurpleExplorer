@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -35,7 +36,7 @@ public class MainWindow : Window
 
         var viewModal = new MessageDetailsWindowViewModel
         {
-            Message = grid.SelectedItem as Message, 
+            Message = grid.SelectedItem as Message,
             ConnectionString = mainWindowViewModel.ConnectionString,
             Subscription = mainWindowViewModel.CurrentSubscription,
             Queue = mainWindowViewModel.CurrentQueue
@@ -55,6 +56,11 @@ public class MainWindow : Window
         }
     }
 
+    private async void RulesGrid_DoubleTapped(object sender, RoutedEventArgs e)
+    {
+        await MessageBoxHelper.ShowMessage("Info", "Under development");
+    }
+
     private async void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var mainWindowViewModel = DataContext as MainWindowViewModel;
@@ -62,12 +68,13 @@ public class MainWindow : Window
 
         ClearOtherSelections(treeView);
         mainWindowViewModel.ClearAllSelections();
-            
+
         var selectedItem = treeView.SelectedItems.Count > 0 ? treeView.SelectedItems[0] : null;
         if (selectedItem is ServiceBusSubscription selectedSubscription)
         {
             mainWindowViewModel.SetSelectedSubscription(selectedSubscription);
             await mainWindowViewModel.FetchMessages();
+            await mainWindowViewModel.FetchRules();
             mainWindowViewModel.RefreshTabHeaders();
         }
 
@@ -75,7 +82,7 @@ public class MainWindow : Window
         {
             mainWindowViewModel.SetSelectedTopic(selectedTopic);
         }
-            
+
         if (selectedItem is ServiceBusQueue selectedQueue)
         {
             mainWindowViewModel.SetSelectedQueue(selectedQueue);

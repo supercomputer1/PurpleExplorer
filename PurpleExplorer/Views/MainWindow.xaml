@@ -186,7 +186,16 @@
                             </DataGrid.Columns>
                         </DataGrid>
                     </TabItem>
-                </TabControl>
+                    <TabItem Header="{Binding RulesTabHeader}" VerticalContentAlignment="Center">
+                        <DataGrid Items="{Binding Rules}" Tapped="MessagesGrid_Tapped"
+                                DoubleTapped="RulesGrid_DoubleTapped" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                                <DataGridTextColumn Header="Filter" Binding="{Binding Filter}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+            </TabControl>
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="2" Dock="Bottom">

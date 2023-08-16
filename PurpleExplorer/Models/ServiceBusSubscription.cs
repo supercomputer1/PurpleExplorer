@@ -5,7 +5,7 @@ namespace PurpleExplorer.Models;
 public class ServiceBusSubscription : MessageCollection
 {
     public string Name { get; set; }
-       
+
     public ServiceBusTopic Topic { get; set; }
 
     public ServiceBusSubscription(SubscriptionRuntimeInfo subscription)
