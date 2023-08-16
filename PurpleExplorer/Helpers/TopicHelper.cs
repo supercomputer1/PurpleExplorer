@@ -87,7 +87,7 @@ public class TopicHelper : BaseHelper, ITopicHelper
             var subscriptions = await GetSubscriptions(client, newTopic.Name);
             newTopic.AddSubscriptions(subscriptions.ToArray());
         }
-        
+
         await client.CloseAsync();
         return newTopic;
     }
@@ -308,5 +308,14 @@ public class TopicHelper : BaseHelper, ITopicHelper
         }
 
         await receiver.CloseAsync();
+    }
+
+
+    public async Task<IList<Rule>> GetRulesBySubscription(ServiceBusConnectionString connectionString, string topicPath, string subscriptionName)
+    {
+        var client = GetManagementClient(connectionString);
+        var rules = await client.GetRulesAsync(topicPath, subscriptionName);
+
+        return rules.Select(rule => new Rule(rule.Name, rule.Filter.ToString())).ToList();
     }
 }

@@ -21,11 +21,12 @@ public class MainWindowViewModel : ViewModelBase
     private readonly ITopicHelper _topicHelper;
     private readonly IQueueHelper _queueHelper;
     private readonly ILoggingService _loggingService;
+    private string _rulesTabHeader;
     private string _messageTabHeader;
     private string _dlqTabHeader;
     private string _topicTabHeader;
     private string _queueTabHeader;
-        
+
     private ServiceBusSubscription _currentSubscription;
     private ServiceBusTopic _currentTopic;
     private ServiceBusQueue _currentQueue;
@@ -33,12 +34,19 @@ public class MainWindowViewModel : ViewModelBase
     private IObservable<bool> _queueLevelActionEnabled;
     private MessageCollection _currentMessageCollection;
     private IAppState _appState;
-        
+
+    public ObservableCollection<Rule> Rules { get; }
     public ObservableCollection<Message> Messages { get; }
     public ObservableCollection<Message> DlqMessages { get; }
     public ObservableCollection<ServiceBusResource> ConnectedServiceBuses { get; }
-        
+
     public ServiceBusConnectionString ConnectionString { get; set; }
+
+    public string RulesTabHeader
+    {
+        get => _rulesTabHeader;
+        set => this.RaiseAndSetIfChanged(ref _rulesTabHeader, value);
+    }
 
     public string MessagesTabHeader
     {
@@ -57,13 +65,13 @@ public class MainWindowViewModel : ViewModelBase
         get => _topicTabHeader;
         set => this.RaiseAndSetIfChanged(ref _topicTabHeader, value);
     }
-        
+
     public string QueueTabHeader
     {
         get => _queueTabHeader;
         set => this.RaiseAndSetIfChanged(ref _queueTabHeader, value);
     }
-        
+
     public ServiceBusSubscription CurrentSubscription
     {
         get => _currentSubscription;
@@ -87,7 +95,7 @@ public class MainWindowViewModel : ViewModelBase
         get => _currentQueue;
         set => this.RaiseAndSetIfChanged(ref _currentQueue, value);
     }
-        
+
     public MessageCollection CurrentMessageCollection
     {
         get
@@ -116,14 +124,15 @@ public class MainWindowViewModel : ViewModelBase
         _queueHelper = Locator.Current.GetService<IQueueHelper>();
         _appState = Locator.Current.GetService<IAppState>();
 
+        Rules = new ObservableCollection<Rule>();
         Messages = new ObservableCollection<Message>();
         DlqMessages = new ObservableCollection<Message>();
         ConnectedServiceBuses = new ObservableCollection<ServiceBusResource>();
 
         _queueLevelActionEnabled = this.WhenAnyValue(
             x => x.CurrentSubscription,
-            x=> x.CurrentQueue,
-            (subscription, queue) => subscription != null || queue != null 
+            x => x.CurrentQueue,
+            (subscription, queue) => subscription != null || queue != null
         );
 
         RefreshTabHeaders();
@@ -173,7 +182,7 @@ public class MainWindowViewModel : ViewModelBase
         ConnectionString = new ServiceBusConnectionString
         {
             ConnectionString = returnedViewModel.ConnectionString,
-            UseManagedIdentity= returnedViewModel.UseManagedIdentity
+            UseManagedIdentity = returnedViewModel.UseManagedIdentity
         };
 
         if (string.IsNullOrEmpty(ConnectionString.ConnectionString))
@@ -228,7 +237,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             return;
         }
-            
+
         Messages.Clear();
         CurrentSubscription.ClearMessages();
         var messages =
@@ -245,7 +254,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             return;
         }
-            
+
         DlqMessages.Clear();
         CurrentSubscription.ClearDlqMessages();
         var dlqMessages =
@@ -254,46 +263,48 @@ public class MainWindowViewModel : ViewModelBase
         CurrentSubscription.AddDlqMessages(dlqMessages);
         DlqMessages.AddRange(dlqMessages);
     }
-        
+
     public async Task FetchQueueMessages()
     {
         if (CurrentQueue == null)
         {
             return;
         }
-            
+
         Messages.Clear();
         CurrentQueue.ClearMessages();
         var messages = await _queueHelper.GetMessages(CurrentQueue.ServiceBus.ConnectionString, CurrentQueue.Name);
         CurrentQueue.AddMessages(messages);
         Messages.AddRange(messages);
     }
-        
+
     public async Task FetchQueueDlqMessages()
     {
         if (CurrentQueue == null)
         {
             return;
         }
-            
+
         DlqMessages.Clear();
         CurrentQueue.ClearDlqMessages();
         var messages = await _queueHelper.GetDlqMessages(CurrentQueue.ServiceBus.ConnectionString, CurrentQueue.Name);
         CurrentQueue.AddDlqMessages(messages);
         DlqMessages.AddRange(messages);
     }
-        
+
     public void RefreshTabHeaders()
     {
         if (CurrentMessageCollection != null)
         {
             MessagesTabHeader = $"Messages ({CurrentMessageCollection.MessageCount})";
             DlqTabHeader = $"Dead-letter ({CurrentMessageCollection.DlqCount})";
+            RulesTabHeader = $"Rules ({CurrentMessageCollection.RuleCount})";
         }
         else
         {
             MessagesTabHeader = "Messages";
             DlqTabHeader = "Dead-letter";
+            RulesTabHeader = "Rules";
         }
 
         var topicCount = ConnectedServiceBuses.Sum(x => x.Topics.Count);
@@ -323,7 +334,7 @@ public class MainWindowViewModel : ViewModelBase
             serviceBusResource.AddQueues(serviceBusQueues.ToArray());
         }
     }
-        
+
     public async void AddMessage()
     {
         var viewModal = new AddMessageWindowViewModal();
@@ -341,7 +352,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             return;
         }
-            
+
         LoggingService.Log("Sending message...");
         if (CurrentTopic != null)
         {
@@ -360,7 +371,7 @@ public class MainWindowViewModel : ViewModelBase
     public async void TransferDeadletterMessages()
     {
         string dlqPath = null;
-        string transferTo = null; 
+        string transferTo = null;
         if (_currentSubscription != null)
         {
             transferTo = $"{_currentTopic.Name}/{_currentSubscription.Name}";
@@ -372,11 +383,11 @@ public class MainWindowViewModel : ViewModelBase
             transferTo = $"{_currentQueue.Name}";
             dlqPath = $"{transferTo}/$DeadLetterQueue";
         }
-            
+
         var buttonResult = await MessageBoxHelper.ShowConfirmation(
             "Transferring messages from DLQ",
             $"Are you sure you would like to transfer ALL the messages on {dlqPath} back to {transferTo}?");
-            
+
         // Because buttonResult can be None or No
         if (buttonResult != ButtonResult.Yes)
         {
@@ -448,7 +459,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             var connectionString = CurrentQueue.ServiceBus.ConnectionString;
             purgedCount = await _queueHelper.PurgeMessages(connectionString, _currentQueue.Name, isDlq);
-                
+
             if (!isDlq)
                 CurrentQueue.ClearMessages();
             else
@@ -466,7 +477,7 @@ public class MainWindowViewModel : ViewModelBase
         RefreshTabHeaders();
         await FetchMessages();
     }
-        
+
     public async Task FetchMessages()
     {
         LoggingService.Log("Fetching messages...");
@@ -510,7 +521,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         await ModalWindowHelper.ShowModalWindow<AppSettingsWindow>(_appState as AppState);
     }
-        
+
     public void ClearAllSelections()
     {
         CurrentSubscription = null;
@@ -519,6 +530,25 @@ public class MainWindowViewModel : ViewModelBase
         CurrentMessage = null;
         Messages.Clear();
         DlqMessages.Clear();
+        Rules.Clear();
         RefreshTabHeaders();
+    }
+
+    public async Task FetchRules()
+    {
+        if (CurrentSubscription == null)
+        {
+            return;
+        }
+
+        var rules = await _topicHelper.GetRulesBySubscription(ConnectionString, CurrentTopic.Name, CurrentSubscription.Name);
+
+        Rules.Clear();
+        CurrentSubscription.ClearRules();
+
+        CurrentSubscription.AddRules(rules);
+        Rules.AddRange(rules);
+
+        LoggingService.Log("Fetched rules");
     }
 }
