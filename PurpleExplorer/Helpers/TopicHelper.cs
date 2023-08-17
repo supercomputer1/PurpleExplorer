@@ -316,6 +316,21 @@ public class TopicHelper : BaseHelper, ITopicHelper
         var client = GetManagementClient(connectionString);
         var rules = await client.GetRulesAsync(topicPath, subscriptionName);
 
-        return rules.Select(rule => new Rule(rule.Name, rule.Filter.ToString())).ToList();
+        return rules.Select(rule => new Rule(rule.Name, rule.Filter!.ToString()!)).ToList();
+    }
+
+
+    public async Task DeleteRule(ServiceBusConnectionString connectionString, string topicPath, string subscriptionName, string ruleName)
+    {
+        var client = GetManagementClient(connectionString);
+        await client.DeleteRuleAsync(topicPath, subscriptionName, ruleName);
+    }
+
+    public async Task AddRule(ServiceBusConnectionString connectionString, string topicPath, string subscriptionName, string ruleName, string sqlExpression)
+    {
+        var client = GetManagementClient(connectionString);
+
+        // TODO: The filter doesn't necessarily have to be an SQL-expression
+        await client.CreateRuleAsync(topicPath, subscriptionName, new RuleDescription(ruleName, new SqlFilter(sqlExpression)));
     }
 }

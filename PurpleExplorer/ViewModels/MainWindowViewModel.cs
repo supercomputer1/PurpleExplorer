@@ -30,6 +30,7 @@ public class MainWindowViewModel : ViewModelBase
     private ServiceBusSubscription _currentSubscription;
     private ServiceBusTopic _currentTopic;
     private ServiceBusQueue _currentQueue;
+    private Rule _currentRule;
     private Message _currentMessage;
     private IObservable<bool> _queueLevelActionEnabled;
     private MessageCollection _currentMessageCollection;
@@ -82,6 +83,12 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _currentTopic;
         set => this.RaiseAndSetIfChanged(ref _currentTopic, value);
+    }
+
+    public Rule CurrentRule
+    {
+        get => _currentRule;
+        set => this.RaiseAndSetIfChanged(ref _currentRule, value);
     }
 
     public Message CurrentMessage
@@ -476,6 +483,7 @@ public class MainWindowViewModel : ViewModelBase
         await RefreshConnectedServiceBuses();
         RefreshTabHeaders();
         await FetchMessages();
+        await FetchRules();
     }
 
     public async Task FetchMessages()
@@ -503,6 +511,18 @@ public class MainWindowViewModel : ViewModelBase
     {
         CurrentTopic = selectedTopic;
         LoggingService.Log("Topic selected: " + selectedTopic.Name);
+    }
+
+    public void SetSelectedRule(Rule rule)
+    {
+        // There is no need to select the same message twice
+        if (CurrentRule != null && rule.Name == CurrentRule.Name)
+        {
+            return;
+        }
+
+        CurrentRule = rule;
+        LoggingService.Log("Rule selected: " + rule.Name);
     }
 
     public void SetSelectedMessage(Message message)
@@ -550,5 +570,22 @@ public class MainWindowViewModel : ViewModelBase
         Rules.AddRange(rules);
 
         LoggingService.Log("Fetched rules");
+    }
+
+    public async void AddRule()
+    {
+        try
+        {
+            await _topicHelper.AddRule(ConnectionString, CurrentTopic.Name, CurrentSubscription.Name, "vnd.test", "[X-Content-Type]='vnd.test.json'");
+        }
+        catch (Exception ex)
+        {
+            LoggingService.Log(ex.Message);
+        }
+
+        LoggingService.Log("Created rule: {rulename}.");
+
+        await FetchRules();
+        RefreshTabHeaders();
     }
 }

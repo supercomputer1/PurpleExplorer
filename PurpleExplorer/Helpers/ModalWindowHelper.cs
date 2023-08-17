@@ -20,11 +20,10 @@ public static class ModalWindowHelper
 
         await window.ShowDialog(mainWindow);
     }
-        
+
     public static async Task<U> ShowModalWindow<T, U>(ViewModelBase viewModel) where T : Window, new() where U : ViewModelBase
     {
-        var mainWindow = (Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)
-            .Windows[0];
+        var mainWindow = (Application.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).Windows[0];
 
         var window = new T
         {

@@ -45,7 +45,7 @@ public class MessageDetailsWindowViewModel : ViewModelBase
                 ? $"{Queue.Name}/$DeadLetterQueue"
                 : $"{Queue.Name}";
         }
-            
+
         var buttonResult = await MessageBoxHelper.ShowConfirmation(
             $"Deleting message from {deletingPath}",
             $"DANGER!!! READ CAREFULLY \n" +
@@ -67,8 +67,8 @@ public class MessageDetailsWindowViewModel : ViewModelBase
             var connectionString = Subscription.Topic.ServiceBus.ConnectionString;
             await _topicHelper.DeleteMessage(connectionString, Subscription.Topic.Name, Subscription.Name,
                 Message, Message.IsDlq);
-                
-            if(!Message.IsDlq) 
+
+            if (!Message.IsDlq)
                 Subscription.RemoveMessage(Message.MessageId);
             else
                 Subscription.RemoveDlqMessage(Message.MessageId);
@@ -78,8 +78,8 @@ public class MessageDetailsWindowViewModel : ViewModelBase
         {
             var connectionString = Queue.ServiceBus.ConnectionString;
             await _queueHelper.DeleteMessage(connectionString, Queue.Name, Message, Message.IsDlq);
-                
-            if(!Message.IsDlq) 
+
+            if (!Message.IsDlq)
                 Queue.RemoveMessage(Message.MessageId);
             else
                 Queue.RemoveDlqMessage(Message.MessageId);
@@ -106,7 +106,7 @@ public class MessageDetailsWindowViewModel : ViewModelBase
 
         _loggingService.Log($"Resent DLQ message: {Message.MessageId}");
     }
-        
+
     public async Task DeadletterMessage()
     {
         _loggingService.Log("DANGER NOTE: Sending to dead-letter requires receiving all the messages up to the selected message to perform this action and this increases the DeliveryCount of the messages");
@@ -122,7 +122,7 @@ public class MessageDetailsWindowViewModel : ViewModelBase
         {
             return;
         }
-            
+
         _loggingService.Log($"User accepted to receive messages in order to send message {Message.MessageId} to dead-letter. This is going to increases the DeliveryCount of the messages before it.");
         _loggingService.Log($"Sending message: {Message.MessageId} to dead-letter");
 

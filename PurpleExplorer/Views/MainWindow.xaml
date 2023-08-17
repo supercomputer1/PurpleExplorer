@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:PurpleExplorer.Models"
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
         x:Class="PurpleExplorer.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="PurpleExplorer - cross-platform Azure Service Bus explorer">
@@ -61,6 +61,13 @@
                 <StackPanel Orientation="Horizontal">
                     <i:Icon Value="fa-shuffle" />
                     <TextBlock VerticalAlignment="Center">Transfer DLQ</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Name="btnAddRule" Classes="topButton" IsEnabled="{Binding QueueLevelActionEnabled^}"
+                    Command="{Binding AddRule}">
+                <StackPanel Orientation="Horizontal">
+                    <i:Icon Value="fa-shuffle" />
+                    <TextBlock VerticalAlignment="Center">Add rule</TextBlock>
                 </StackPanel>
             </Button>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
@@ -187,7 +194,7 @@
                         </DataGrid>
                     </TabItem>
                     <TabItem Header="{Binding RulesTabHeader}" VerticalContentAlignment="Center">
-                        <DataGrid Items="{Binding Rules}" Tapped="MessagesGrid_Tapped"
+                        <DataGrid Items="{Binding Rules}" Tapped="RulesGrid_Tapped"
                                 DoubleTapped="RulesGrid_DoubleTapped" IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" />

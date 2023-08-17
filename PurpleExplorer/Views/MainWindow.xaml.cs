@@ -56,9 +56,54 @@ public class MainWindow : Window
         }
     }
 
+    private void RulesGrid_Tapped(object sender, RoutedEventArgs e)
+    {
+        var grid = sender as DataGrid;
+        var mainWindowViewModel = DataContext as MainWindowViewModel;
+
+        if (grid == null)
+        {
+            return;
+        }
+
+        if (mainWindowViewModel == null)
+        {
+            return;
+        }
+
+        if (grid.SelectedItem is Rule rule)
+        {
+            mainWindowViewModel.SetSelectedRule(rule);
+        }
+    }
+
     private async void RulesGrid_DoubleTapped(object sender, RoutedEventArgs e)
     {
-        await MessageBoxHelper.ShowMessage("Info", "Under development");
+        var grid = sender as DataGrid;
+        var mainWindowViewModel = DataContext as MainWindowViewModel;
+
+        if (grid?.SelectedItem == null)
+        {
+            return;
+        }
+
+        if (mainWindowViewModel == null)
+        {
+            return;
+        }
+
+        var viewModal = new RuleDetailsWindowViewModel
+        {
+            Rule = grid.SelectedItem as Rule,
+            ConnectionString = mainWindowViewModel.ConnectionString,
+            Subscription = mainWindowViewModel.CurrentSubscription,
+            Topic = mainWindowViewModel.CurrentTopic
+        };
+
+        await ModalWindowHelper.ShowModalWindow<RuleDetailsWindow, RuleDetailsWindowViewModel>(viewModal);
+
+        await mainWindowViewModel.FetchRules();
+        mainWindowViewModel.RefreshTabHeaders();
     }
 
     private async void TreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)

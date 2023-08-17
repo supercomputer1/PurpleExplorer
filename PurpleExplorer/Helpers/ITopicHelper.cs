@@ -23,4 +23,6 @@ public interface ITopicHelper
         Message message);
 
     public Task<IList<Rule>> GetRulesBySubscription(ServiceBusConnectionString connectionString, string topicPath, string subscriptionName);
+    public Task DeleteRule(ServiceBusConnectionString connectionString, string topicPath, string subscriptionName, string ruleName);
+    public Task AddRule(ServiceBusConnectionString connectionString, string topicPath, string subscriptionName, string ruleName, string sqlExpression);
 }

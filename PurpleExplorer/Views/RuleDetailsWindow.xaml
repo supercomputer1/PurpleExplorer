@@ -1,0 +1,81 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="780" d:DesignHeight="630"
+        x:Class="PurpleExplorer.Views.RuleDetailsWindow"
+        xmlns:vm="clr-namespace:PurpleExplorer.ViewModels;assembly=PurpleExplorer"
+        Title="Rule Details" Icon="/Assets/avalonia-logo.ico"
+        Width="680" Height="630"
+        WindowStartupLocation="CenterOwner">
+
+    <Design.DataContext>
+        <vm:MessageDetailsWindowViewModel />
+    </Design.DataContext>
+    <Window.Styles>
+        <Style Selector="TextBox#ContentTextBlock">
+            <Setter Property="Margin" Value="5, 5, 0, 0" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <Style Selector="TextBlock.left">
+            <Setter Property="Margin" Value="5, 5, 0, 0" />
+            <Setter Property="Width" Value="150" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+        <Style Selector="TextBlock.right">
+            <Setter Property="Margin" Value="5, 5, 0, 0" />
+            <Setter Property="Width" Value="400" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer>
+        <StackPanel Orientation="Vertical">
+            <DockPanel Background="#380f14" Height="30" LastChildFill="False">
+                <Button Name="MinusButton" Classes="topButton" IsEnabled="{Binding !!CurrentRule}"
+                        Command="{Binding DeleteRule}"
+                        CommandParameter="{Binding $parent[Window]}">
+                    <StackPanel Orientation="Horizontal">
+                        <DrawingPresenter Drawing="{DynamicResource Material.Delete}" />
+                        <TextBlock VerticalAlignment="Center">Delete Rule</TextBlock>
+                    </StackPanel>
+                </Button>
+            </DockPanel>
+
+            <Grid MinHeight="600" VerticalAlignment="Top" ShowGridLines="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                    <RowDefinition MinHeight="30" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="500" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Name" Classes="left" Grid.Row="0" Grid.Column="0" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Rule.Name}" Classes="right" />
+
+                <TextBlock Text="Filter" Classes="left" Grid.Row="1" Grid.Column="0" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Rule.Filter}" Classes="right" />
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
