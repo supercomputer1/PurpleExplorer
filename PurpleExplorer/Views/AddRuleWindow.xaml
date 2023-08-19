@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:PurpleExplorer.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="480"
+        x:Class="PurpleExplorer.Views.AddRuleWindow"
+        Title="Add rule" Icon="/Assets/avalonia-logo.ico"
+        Width="620" Height="480"
+        WindowStartupLocation="CenterOwner">
+
+    <Design.DataContext>
+        <viewModels:AddRuleWindowViewModal />
+    </Design.DataContext>
+
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
+
+    <StackPanel Margin="10">
+        <TextBox Watermark="Name (vnd.test)" Text="{Binding Path=Name}" />
+        <TextBox Watermark="Filter ([X-Content-Type]='vnd.test.json')" Text="{Binding Path=Filter}" />
+        <Button MinWidth="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Command="{Binding AddRule}">Add</Button>
+        <Button MinWidth="200" Height="30" Margin="5,0,5,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Click="btnClose">Exit</Button>
+    </StackPanel>
+
+    </Grid>
+</Window>

@@ -15,8 +15,8 @@ public class AddMessageWindowViewModal : DialogViewModelBase
     {
         get => _message;
         set => this.RaiseAndSetIfChanged(ref _message, value);
-    }        
-        
+    }
+
     public string Title
     {
         get => _title;

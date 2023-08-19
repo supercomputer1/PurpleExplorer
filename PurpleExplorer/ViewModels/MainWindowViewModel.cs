@@ -574,16 +574,19 @@ public class MainWindowViewModel : ViewModelBase
 
     public async void AddRule()
     {
-        try
+        var viewModal = new AddRuleWindowViewModal
         {
-            await _topicHelper.AddRule(ConnectionString, CurrentTopic.Name, CurrentSubscription.Name, "vnd.test", "[X-Content-Type]='vnd.test.json'");
-        }
-        catch (Exception ex)
-        {
-            LoggingService.Log(ex.Message);
-        }
+            ConnectionString = ConnectionString,
+            Topic = CurrentTopic,
+            Subscription = CurrentSubscription
+        };
 
-        LoggingService.Log("Created rule: {rulename}.");
+        var returnedViewModal = await ModalWindowHelper.ShowModalWindow<AddRuleWindow, AddRuleWindowViewModal>(viewModal);
+
+        if (returnedViewModal.Cancel)
+        {
+            return;
+        }
 
         await FetchRules();
         RefreshTabHeaders();
